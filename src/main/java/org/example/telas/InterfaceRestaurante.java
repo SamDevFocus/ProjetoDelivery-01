@@ -6,320 +6,406 @@ import org.example.services.RestauranteService;
 import org.example.utils.Input;
 import java.util.List;
 import org.example.services.PedidoService;
+import org.example.utils.Loading;
 import org.example.utils.StatusPedido;
 
+import static org.example.utils.Input.lerOpcao;
 import static org.example.utils.Loading.limparTela;
 
 public class InterfaceRestaurante {
 
     private PedidoService pedidoService = new PedidoService();
-
-    private RestauranteService restauranteService =
-            new RestauranteService();
-
+    private RestauranteService restauranteService = new RestauranteService();
     private Restaurante restauranteLogado;
+    private InterfaceProdutoRestaurante produtoInterface = new InterfaceProdutoRestaurante();
 
-    private InterfaceProdutoRestaurante produtoInterface =
-            new InterfaceProdutoRestaurante();
+    // =========================================================
+    // UTILITARIO — leitura segura de texto nao vazio
+    // evita campos em branco no cadastro
+    // =========================================================
+    private String lerTexto(String campo) {
+        while (true) {
+            String valor = Input.scanner.nextLine();
+            if (!valor.trim().isEmpty()) {
+                return valor;
+            }
+            System.out.print("  > " + campo + " não pode ser vazio: ");
+        }
+    }
 
-
-    public void inicioRestaurante(){
+    // =========================================================
+    // INICIO
+    // =========================================================
+    public void inicioRestaurante() {
         boolean rodando = true;
+
         while (rodando) {
+            Loading.LimparTerminal("Carregando...");
 
-            limparTela();
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│         DELIVERY SYSTEM          │");
+            System.out.println("│           > Restaurante          │");
+            System.out.println("├──────────────────────────────────┤");
+            System.out.println("│                                  │");
+            System.out.println("│  [1] Entrar                      │");
+            System.out.println("│  [2] Criar Conta                 │");
+            System.out.println("│                                  │");
+            System.out.println("│  [0] Voltar                      │");
+            System.out.println("│                                  │");
+            System.out.println("└──────────────────────────────────┘");
+            System.out.print("  > ");
 
-            System.out.println("+---------------------------------+");
-            System.out.println("|            DELIVERY             |");
-            System.out.println("+---------------------------------+");
-            System.out.println("| Restaurante                     |");
-            System.out.println("+---------------------------------+");
-            System.out.println("|       1 - Entrar                |");
-            System.out.println("|       2 - Criar Conta           |");
-            System.out.println("|       3 - Sair                  |");
-            System.out.println("+---------------------------------+");
-            System.out.print("Escolha uma opção: ");
+            int opcao = lerOpcao();
 
-
-            int opcaoInicialRestaurante = Input.scanner.nextInt();
-            switch (opcaoInicialRestaurante) {
+            switch (opcao) {
                 case 1:
-                    System.out.println("1 Entrar");
                     exibirLogin();
                     break;
                 case 2:
-                    System.out.println("2 Criar Conta");
                     exibirCadastro();
                     break;
-                case 3:
-                    System.out.println("3 Sair");
+                case 0:
+                    Loading.LimparTerminal("Voltando...");
                     rodando = false;
                     break;
                 default:
-                    System.out.println("Opção invalida");
-
+                    System.out.println("  > Opção inválida! Escolha 0, 1 ou 2.");
             }
         }
     }
 
-    public void exibirLogin(){
+    // =========================================================
+    // LOGIN
+    // =========================================================
+    public void exibirLogin() {
+        Loading.LimparTerminal("Carregando login...");
 
-        limparTela();
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│        LOGIN - RESTAURANTE       │");
+        System.out.println("├──────────────────────────────────┤");
+        System.out.println("│  Informe suas credenciais:       │");
+        System.out.println("└──────────────────────────────────┘");
 
         Input.scanner.nextLine();
 
-        System.out.println("Email:");
-        String email =
-                Input.scanner.nextLine();
+        System.out.print("  > Email: ");
+        String email = lerTexto("Email");
 
-        System.out.println("Senha:");
-        String senha =
-                Input.scanner.nextLine();
+        System.out.print("  > Senha: ");
+        String senha = lerTexto("Senha");
 
-        Restaurante restaurante =
-                restauranteService.login(
-                        email,
-                        senha
-                );
+        Loading.LimparTerminal("Autenticando...");
 
-        if(restaurante != null){
+        Restaurante restaurante = restauranteService.login(email, senha);
 
+        if (restaurante != null) {
             restauranteLogado = restaurante;
 
-            System.out.println(
-                    "Bem vindo "
-                            + restaurante.getNome()
-            );
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.printf ("│  Bem-vindo, %-21s│%n", restaurante.getNome() + "!");
+            System.out.println("└──────────────────────────────────┘");
+            System.out.println("  [ENTER] Continuar...");
+            Input.scanner.nextLine();
 
             exibirMenu();
-
         } else {
-
-            System.out.println(
-                    "Login invalido!"
-            );
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│  > Email ou senha incorretos!    │");
+            System.out.println("│  > Verifique e tente novamente.  │");
+            System.out.println("└──────────────────────────────────┘");
+            System.out.println("  [ENTER] Voltar...");
+            Input.scanner.nextLine();
         }
     }
 
-    public void exibirCadastro(){
+    // =========================================================
+    // CADASTRO
+    // =========================================================
+    public void exibirCadastro() {
+        Loading.LimparTerminal("Carregando cadastro...");
 
-        limparTela();
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│       CADASTRO - RESTAURANTE     │");
+        System.out.println("├──────────────────────────────────┤");
+        System.out.println("│  Preencha os dados abaixo:       │");
+        System.out.println("└──────────────────────────────────┘");
 
         Input.scanner.nextLine();
 
-        Restaurante restaurante =
-                new Restaurante();
+        Restaurante restaurante = new Restaurante();
 
-        System.out.println("Nome:");
-        restaurante.setNome(
-                Input.scanner.nextLine()
-        );
+        System.out.print("  > Nome do restaurante: ");
+        restaurante.setNome(lerTexto("Nome"));
 
-        System.out.println("Endereco:");
-        restaurante.setEndereco(
-                Input.scanner.nextLine()
-        );
+        System.out.print("  > Endereço: ");
+        restaurante.setEndereco(lerTexto("Endereço"));
 
-        System.out.println("CNPJ:");
-        restaurante.setCnpj(
-                Input.scanner.nextLine()
-        );
+        System.out.print("  > CNPJ: ");
+        restaurante.setCnpj(lerTexto("CNPJ"));
 
-        System.out.println("Telefone:");
-        restaurante.setTelefone(
-                Input.scanner.nextLine()
-        );
+        System.out.print("  > Telefone: ");
+        restaurante.setTelefone(lerTexto("Telefone"));
 
-        System.out.println("Categoria:");
-        restaurante.setCategoria(
-                Input.scanner.nextLine()
-        );
+        System.out.print("  > Categoria: ");
+        restaurante.setCategoria(lerTexto("Categoria"));
 
-        System.out.println("Email:");
-        restaurante.setEmail(
-                Input.scanner.nextLine()
-        );
+        System.out.print("  > Email: ");
+        restaurante.setEmail(lerTexto("Email"));
 
-        System.out.println("Senha:");
-        restaurante.setSenha(
-                Input.scanner.nextLine()
-        );
+        System.out.print("  > Senha: ");
+        restaurante.setSenha(lerTexto("Senha"));
 
-        restauranteService.cadastrar(
-                restaurante
-        );
+        restauranteService.cadastrar(restaurante);
 
-        System.out.println(
-                "Cadastro realizado!"
-        );
+        Loading.LimparTerminal("Salvando dados...");
+
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│       CADASTRO REALIZADO!        │");
+        System.out.println("├──────────────────────────────────┤");
+        System.out.printf ("│  Nome:      %-21s│%n", restaurante.getNome());
+        System.out.printf ("│  CNPJ:      %-21s│%n", restaurante.getCnpj());
+        System.out.printf ("│  Email:     %-21s│%n", restaurante.getEmail());
+        System.out.printf ("│  Telefone:  %-21s│%n", restaurante.getTelefone());
+        System.out.printf ("│  Categoria: %-21s│%n", restaurante.getCategoria());
+        System.out.println("└──────────────────────────────────┘");
+        System.out.println("  [ENTER] Continuar...");
+        Input.scanner.nextLine();
     }
 
-    public void exibirMenu(){
-
-        limparTela();
-
+    // =========================================================
+    // MENU PRINCIPAL
+    // =========================================================
+    public void exibirMenu() {
         if (restauranteLogado == null) {
-            System.out.println("Faça login primeiro!");
-            return;
-        }
-
-        boolean rodando = true;
-
-        while (rodando){
-
-            System.out.println("+------ MENU RESTAURANTE ------+");
-            System.out.println("1 - Ver pedidos");
-            System.out.println("2 - Gerenciar pedidos");
-            System.out.println("3 - Gerenciar cardápio");
-            System.out.println("4 - Sair");
-            System.out.print("Escolha: ");
-
-            int opcao = Input.scanner.nextInt();
-
-            switch (opcao){
-
-                case 1:
-                    visualizarPedidos();
-                    break;
-
-                case 2:
-                    menuPedidos();
-                    break;
-
-                case 3:
-                    produtoInterface.menu(restauranteLogado);
-                    break;
-
-                case 4:
-                    rodando = false;
-                    break;
-
-                default:
-                    System.out.println("Opção inválida");
-            }
-        }
-    }
-
-
-
-    public void menuPedidos() {
-
-        limparTela();
-
-        if (restauranteLogado == null) {
-            System.out.println("Faça login primeiro!");
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│  > Faça login primeiro!          │");
+            System.out.println("└──────────────────────────────────┘");
             return;
         }
 
         boolean rodando = true;
 
         while (rodando) {
+            Loading.LimparTerminal("Carregando menu...");
 
-            System.out.println("+------ MENU PEDIDOS ------+");
-            System.out.println("1 - Ver pedidos");
-            System.out.println("2 - Aceitar pedido");
-            System.out.println("3 - Finalizar pedido");
-            System.out.println("4 - Cancelar pedido");
-            System.out.println("5 - Voltar");
-            System.out.print("Escolha: ");
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│         MENU - RESTAURANTE       │");
+            System.out.printf ("│  Olá, %-27s│%n", restauranteLogado.getNome() + "!");
+            System.out.println("├──────────────────────────────────┤");
+            System.out.println("│                                  │");
+            System.out.println("│  [1] Ver pedidos                 │");
+            System.out.println("│  [2] Gerenciar pedidos           │");
+            System.out.println("│  [3] Gerenciar cardápio          │");
+            System.out.println("│                                  │");
+            System.out.println("│  [0] Sair                        │");
+            System.out.println("│                                  │");
+            System.out.println("└──────────────────────────────────┘");
+            System.out.print("  > ");
 
-            int opcao = Input.scanner.nextInt();
+            int opcao = lerOpcao();
 
             switch (opcao) {
-
                 case 1:
                     visualizarPedidos();
                     break;
-
                 case 2:
-                    aceitarPedido();
+                    menuPedidos();
                     break;
-
                 case 3:
-                    finalizarPedido();
+                    produtoInterface.menu(restauranteLogado);
                     break;
-
-                case 4:
-                    cancelarPedido();
-                    break;
-
-                case 5:
+                case 0:
+                    Loading.LimparTerminal("Saindo...");
                     rodando = false;
                     break;
-
                 default:
-                    System.out.println("Opção inválida");
+                    System.out.println("  > Opção inválida! Escolha entre 0 e 3.");
             }
         }
     }
 
-    public void visualizarPedidos() {
-
-        limparTela();
-
+    // =========================================================
+    // MENU PEDIDOS
+    // =========================================================
+    public void menuPedidos() {
         if (restauranteLogado == null) {
-            System.out.println("Faça login primeiro!");
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│  > Faça login primeiro!          │");
+            System.out.println("└──────────────────────────────────┘");
             return;
         }
 
-        List<Pedido> pedidos =
-                pedidoService.listarPorRestaurante(restauranteLogado.getId());
+        boolean rodando = true;
+
+        while (rodando) {
+            Loading.LimparTerminal("Carregando pedidos...");
+
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│         GERENCIAR PEDIDOS        │");
+            System.out.println("├──────────────────────────────────┤");
+            System.out.println("│                                  │");
+            System.out.println("│  [1] Ver pedidos                 │");
+            System.out.println("│  [2] Aceitar pedido              │");
+            System.out.println("│  [3] Finalizar pedido            │");
+            System.out.println("│  [4] Cancelar pedido             │");
+            System.out.println("│                                  │");
+            System.out.println("│  [0] Voltar                      │");
+            System.out.println("│                                  │");
+            System.out.println("└──────────────────────────────────┘");
+            System.out.print("  > ");
+
+            int opcao = lerOpcao();
+
+            switch (opcao) {
+                case 1:
+                    visualizarPedidos();
+                    break;
+                case 2:
+                    aceitarPedido();
+                    break;
+                case 3:
+                    finalizarPedido();
+                    break;
+                case 4:
+                    cancelarPedido();
+                    break;
+                case 0:
+                    Loading.LimparTerminal("Voltando...");
+                    rodando = false;
+                    break;
+                default:
+                    System.out.println("  > Opção inválida! Escolha entre 0 e 4.");
+            }
+        }
+    }
+
+    // =========================================================
+    // VISUALIZAR PEDIDOS
+    // =========================================================
+    public void visualizarPedidos() {
+        if (restauranteLogado == null) {
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│  > Faça login primeiro!          │");
+            System.out.println("└──────────────────────────────────┘");
+            return;
+        }
+
+        Loading.LimparTerminal("Buscando pedidos...");
+
+        List<Pedido> pedidos = pedidoService.listarPorRestaurante(restauranteLogado.getId());
+
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│           SEUS PEDIDOS           │");
+        System.out.println("├──────────────────────────────────┤");
 
         if (pedidos.isEmpty()) {
-            System.out.println("Nenhum pedido encontrado.");
+            System.out.println("│  > Nenhum pedido encontrado.     │");
+            System.out.println("└──────────────────────────────────┘");
+        } else {
+            for (Pedido p : pedidos) {
+                System.out.printf("│  ID:      %-23s│%n", "#" + String.format("%04d", p.getId()));
+                System.out.printf("│  Cliente: %-23s│%n", p.getIdCliente());
+                System.out.printf("│  Status:  %-23s│%n", p.getStatus());
+                System.out.println("├──────────────────────────────────┤");
+            }
+            System.out.println("└──────────────────────────────────┘");
+        }
+
+        System.out.println("  [ENTER] Voltar...");
+        Input.scanner.nextLine();
+        Input.scanner.nextLine();
+    }
+
+    // =========================================================
+    // ACEITAR PEDIDO
+    // =========================================================
+    public void aceitarPedido() {
+        Loading.LimparTerminal("Carregando...");
+
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│          ACEITAR PEDIDO          │");
+        System.out.println("│  Digite 0 para voltar.           │");
+        System.out.println("└──────────────────────────────────┘");
+        System.out.print("  > ID do pedido: #");
+
+        int id = lerOpcao();
+
+        if (id == 0) {
+            System.out.println("  > Operação cancelada.");
             return;
         }
 
-        System.out.println("+------ PEDIDOS ------+");
+        pedidoService.atualizarStatus(id, StatusPedido.EM_PREPARO);
+        Loading.LimparTerminal("Processando...");
 
-        for (Pedido p : pedidos) {
-            System.out.println("ID: " + p.getId());
-            System.out.println("Cliente: " + p.getIdCliente());
-            System.out.println("Status: " + p.getStatus());
-            System.out.println("+---------------------+");
-        }
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.printf ("│  Pedido #%04d aceito!            │%n", id);
+        System.out.println("│  > Status: Em preparo            │");
+        System.out.println("└──────────────────────────────────┘");
+        System.out.println("  [ENTER] Continuar...");
+        Input.scanner.nextLine();
+        Input.scanner.nextLine();
     }
 
-    public void aceitarPedido() {
-
-        limparTela();
-
-        System.out.println("ID do pedido:");
-
-        int id = Input.scanner.nextInt();
-
-        pedidoService.atualizarStatus(id, StatusPedido.PRONTO);
-
-        System.out.println("Pedido em preparo!");
-    }
-
+    // =========================================================
+    // CANCELAR PEDIDO
+    // =========================================================
     public void cancelarPedido() {
+        Loading.LimparTerminal("Carregando...");
 
-        limparTela();
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│          CANCELAR PEDIDO         │");
+        System.out.println("│  Digite 0 para voltar.           │");
+        System.out.println("└──────────────────────────────────┘");
+        System.out.print("  > ID do pedido: #");
 
-        System.out.println("ID do pedido:");
+        int id = lerOpcao();
 
-        int id = Input.scanner.nextInt();
+        if (id == 0) {
+            System.out.println("  > Operação cancelada.");
+            return;
+        }
 
         pedidoService.atualizarStatus(id, StatusPedido.CANCELADO);
+        Loading.LimparTerminal("Processando...");
 
-        System.out.println("Pedido cancelado com sucesso!");
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.printf ("│  Pedido #%04d cancelado!         │%n", id);
+        System.out.println("│  > Status: Cancelado             │");
+        System.out.println("└──────────────────────────────────┘");
+        System.out.println("  [ENTER] Continuar...");
+        Input.scanner.nextLine();
+        Input.scanner.nextLine();
     }
 
+    // =========================================================
+    // FINALIZAR PEDIDO
+    // =========================================================
     public void finalizarPedido() {
+        Loading.LimparTerminal("Carregando...");
 
-        limparTela();
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│         FINALIZAR PEDIDO         │");
+        System.out.println("│  Digite 0 para voltar.           │");
+        System.out.println("└──────────────────────────────────┘");
+        System.out.print("  > ID do pedido: #");
 
-        System.out.println("ID do pedido:");
+        int id = lerOpcao();
 
-        int id = Input.scanner.nextInt();
+        if (id == 0) {
+            System.out.println("  > Operação cancelada.");
+            return;
+        }
 
         pedidoService.atualizarStatus(id, StatusPedido.PRONTO);
+        Loading.LimparTerminal("Processando...");
 
-        System.out.println("Pedido finalizado e disponível para entrega!");
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.printf ("│  Pedido #%04d finalizado!        │%n", id);
+        System.out.println("│  > Disponivel para entrega!      │");
+        System.out.println("└──────────────────────────────────┘");
+        System.out.println("  [ENTER] Continuar...");
+        Input.scanner.nextLine();
+        Input.scanner.nextLine();
     }
-
-
-
-
 }

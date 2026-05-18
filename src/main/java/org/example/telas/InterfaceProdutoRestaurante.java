@@ -4,6 +4,7 @@ import org.example.models.Produto;
 import org.example.models.Restaurante;
 import org.example.services.ProdutoService;
 import org.example.utils.Input;
+import org.example.utils.Loading;
 
 import java.util.List;
 
@@ -15,98 +16,275 @@ public class InterfaceProdutoRestaurante {
 
     public void menu(Restaurante restauranteLogado) {
 
-        limparTela();
-
         boolean rodando = true;
 
         while (rodando) {
 
-            System.out.println("1 - Criar produto");
-            System.out.println("2 - Listar produtos");
-            System.out.println("3 - Deletar produto");
-            System.out.println("4 - Voltar");
+            Loading.LimparTerminal(
+                    "Carregando cardápio..."
+            );
 
-            int opcao = Input.scanner.nextInt();
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│        GERENCIAR CARDÁPIO        │");
+
+            System.out.printf (
+                    "│  Restaurante: %-17s│%n",
+                    restauranteLogado.getNome()
+            );
+
+            System.out.println("├──────────────────────────────────┤");
+            System.out.println("│                                  │");
+            System.out.println("│  [1] Criar Produto               │");
+            System.out.println("│  [2] Listar Produtos             │");
+            System.out.println("│  [3] Deletar Produto             │");
+            System.out.println("│                                  │");
+            System.out.println("│  [0] Voltar                      │");
+            System.out.println("│                                  │");
+            System.out.println("└──────────────────────────────────┘");
+
+            System.out.print("  > ");
+
+            int opcao =
+                    Input.lerOpcao();
 
             switch (opcao) {
 
                 case 1:
-                    criarProduto(restauranteLogado);
+
+                    criarProduto(
+                            restauranteLogado
+                    );
+
                     break;
 
                 case 2:
-                    listarProdutos(restauranteLogado);
+
+                    listarProdutos(
+                            restauranteLogado
+                    );
+
                     break;
 
                 case 3:
-                    deletarProduto(restauranteLogado);
+
+                    deletarProduto(
+                            restauranteLogado
+                    );
+
                     break;
 
-                case 4:
+                case 0:
+
+                    Loading.LimparTerminal(
+                            "Voltando..."
+                    );
+
                     rodando = false;
                     break;
 
                 default:
-                    System.out.println("Opção inválida");
+
+                    System.out.println(
+                            "\n  > Opção inválida!"
+                    );
+
+                    Loading.esperar(1200);
             }
         }
     }
 
     public void criarProduto(Restaurante restauranteLogado) {
 
-        limparTela();
+        Loading.LimparTerminal(
+                "Abrindo cadastro..."
+        );
 
         Produto p = new Produto();
 
-        Input.scanner.nextLine();
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│          NOVO PRODUTO            │");
+        System.out.println("├──────────────────────────────────┤");
 
-        System.out.println("Nome:");
-        p.setNome(Input.scanner.nextLine());
+        System.out.printf (
+                "│  Restaurante: %-17s│%n",
+                restauranteLogado.getNome()
+        );
 
-        System.out.println("Preço:");
-        p.setPreco(Input.scanner.nextDouble());
+        System.out.println("└──────────────────────────────────┘");
 
-        Input.scanner.nextLine();
+        System.out.print("\n  > Nome: ");
 
-        System.out.println("Categoria:");
-        p.setCategoria(Input.scanner.nextLine());
+        p.setNome(
+                Input.lerTexto("Nome")
+        );
 
-        p.setIdRestaurante(restauranteLogado.getId());
+        System.out.print("  > Preço: R$ ");
+
+        p.setPreco(
+                Double.parseDouble(
+                        Input.scanner.nextLine()
+                )
+        );
+
+        System.out.print("  > Categoria: ");
+
+        p.setCategoria(
+                Input.lerTexto("Categoria")
+        );
+
+        p.setIdRestaurante(
+                restauranteLogado.getId()
+        );
+
+        Loading.LimparTerminal(
+                "Salvando produto..."
+        );
 
         produtoService.cadastrar(p);
 
-        System.out.println("Produto criado!");
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│        PRODUTO CRIADO!           │");
+        System.out.println("├──────────────────────────────────┤");
 
-        limparTela();
+        System.out.printf (
+                "│  Nome: %-26s│%n",
+                p.getNome()
+        );
+
+        System.out.printf (
+                "│  Preço: R$ %-20.2f│%n",
+                p.getPreco()
+        );
+
+        System.out.printf (
+                "│  Categoria: %-21s│%n",
+                p.getCategoria()
+        );
+
+        System.out.println("└──────────────────────────────────┘");
+
+        System.out.println("\n  [ENTER] Continuar...");
+        Input.scanner.nextLine();
     }
 
     public void listarProdutos(Restaurante restauranteLogado) {
 
-        limparTela();
+        Loading.LimparTerminal(
+                "Carregando produtos..."
+        );
 
         List<Produto> produtos =
-                produtoService.listarPorRestaurante(restauranteLogado.getId());
+                produtoService
+                        .listarPorRestaurante(
+                                restauranteLogado.getId()
+                        );
 
-        System.out.println("+------ CARDÁPIO ------+");
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│             CARDÁPIO             │");
 
-        for (Produto p : produtos) {
-            System.out.println("ID: " + p.getId());
-            System.out.println("Nome: " + p.getNome());
-            System.out.println("Categoria: " + p.getCategoria());
-            System.out.println("Preço: R$ " + p.getPreco());
-            System.out.println("+----------------------+");
+        System.out.printf (
+                "│  Restaurante: %-17s│%n",
+                restauranteLogado.getNome()
+        );
+
+        System.out.println("├──────────────────────────────────┤");
+
+        if (produtos.isEmpty()) {
+
+            System.out.println(
+                    "│  Nenhum produto cadastrado.      │"
+            );
+
+        } else {
+
+            for (Produto p : produtos) {
+
+                System.out.printf (
+                        "│  ID: %-28s│%n",
+                        "#" + p.getId()
+                );
+
+                System.out.printf (
+                        "│  Nome: %-26s│%n",
+                        p.getNome()
+                );
+
+                System.out.printf (
+                        "│  Categoria: %-21s│%n",
+                        p.getCategoria()
+                );
+
+                System.out.printf (
+                        "│  Preço: R$ %-20.2f│%n",
+                        p.getPreco()
+                );
+
+                System.out.println(
+                        "├──────────────────────────────────┤"
+                );
+            }
         }
+
+        System.out.println("└──────────────────────────────────┘");
+
+        System.out.println("\n  [ENTER] Voltar...");
+        Input.scanner.nextLine();
     }
 
     public void deletarProduto(Restaurante restauranteLogado) {
 
-        limparTela();
+        Loading.LimparTerminal(
+                "Carregando produtos..."
+        );
 
-        System.out.println("ID do produto para deletar:");
-        int idProduto = Input.scanner.nextInt();
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│          DELETAR PRODUTO         │");
 
-        produtoService.deletarProduto(idProduto, restauranteLogado.getId());
+        System.out.printf (
+                "│  Restaurante: %-17s│%n",
+                restauranteLogado.getNome()
+        );
 
-        System.out.println("Produto deletado com sucesso!");
+        System.out.println("├──────────────────────────────────┤");
+        System.out.println("│  Digite 0 para cancelar          │");
+        System.out.println("└──────────────────────────────────┘");
+
+        System.out.print("\n  > ID do produto: ");
+
+        int idProduto =
+                Input.lerOpcao();
+
+        if (idProduto == 0) {
+
+            System.out.println(
+                    "\n  > Operação cancelada."
+            );
+
+            Loading.esperar(1200);
+
+            return;
+        }
+
+        produtoService.deletarProduto(
+                idProduto,
+                restauranteLogado.getId()
+        );
+
+        Loading.LimparTerminal(
+                "Removendo produto..."
+        );
+
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│       PRODUTO REMOVIDO!          │");
+
+        System.out.printf (
+                "│  Produto #%04d deletado.         │%n",
+                idProduto
+        );
+
+        System.out.println("└──────────────────────────────────┘");
+
+        System.out.println("\n  [ENTER] Continuar...");
+        Input.scanner.nextLine();
     }
 }
