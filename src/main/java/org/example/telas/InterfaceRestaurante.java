@@ -11,7 +11,6 @@ import org.example.utils.StatusPedido;
 
 import static org.example.utils.Input.lerOpcao;
 import static org.example.utils.Input.lerTexto;
-import static org.example.utils.Loading.limparTela;
 
 public class InterfaceRestaurante {
 
@@ -57,6 +56,7 @@ public class InterfaceRestaurante {
                     break;
                 default:
                     System.out.println("  > Opção inválida! Escolha 0, 1 ou 2.");
+                    Loading.esperar(1200);
             }
         }
     }
@@ -72,7 +72,6 @@ public class InterfaceRestaurante {
         System.out.println("├──────────────────────────────────┤");
         System.out.println("│  Informe suas credenciais:       │");
         System.out.println("└──────────────────────────────────┘");
-
 
         System.out.print("  > Email: ");
         String email = lerTexto("Email");
@@ -99,12 +98,12 @@ public class InterfaceRestaurante {
             System.out.println("│  > Email ou senha incorretos!    │");
             System.out.println("│  > Verifique e tente novamente.  │");
             System.out.println("└──────────────────────────────────┘");
-        Input.pausar("  [ENTER] Continuar...");
+            Input.pausar("  [ENTER] Voltar...");
         }
     }
 
     // =========================================================
-    // CADASTRO
+    // CADASTRO — validação em loop por campo
     // =========================================================
     public void exibirCadastro() {
         Loading.LimparTerminal("Carregando cadastro...");
@@ -115,55 +114,78 @@ public class InterfaceRestaurante {
         System.out.println("│  Preencha os dados abaixo:       │");
         System.out.println("└──────────────────────────────────┘");
 
-
         Restaurante restaurante = new Restaurante();
+        String erro;
 
-        System.out.print("  > Nome do restaurante: ");
-        restaurante.setNome(lerTexto("Nome"));
+        // Nome
+        do {
+            System.out.print("  > Nome do restaurante: ");
+            restaurante.setNome(lerTexto("Nome"));
+            erro = restauranteService.validarNome(restaurante.getNome());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        System.out.print("  > Endereço: ");
-        restaurante.setEndereco(lerTexto("Endereço"));
+        // Endereco
+        do {
+            System.out.print("  > Endereço: ");
+            restaurante.setEndereco(lerTexto("Endereço"));
+            erro = restauranteService.validarEndereco(restaurante.getEndereco());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        System.out.print("  > CNPJ: ");
-        restaurante.setCnpj(lerTexto("CNPJ"));
+        // CNPJ
+        do {
+            System.out.print("  > CNPJ (apenas números, 14 dígitos): ");
+            restaurante.setCnpj(lerTexto("CNPJ"));
+            erro = restauranteService.validarCnpj(restaurante.getCnpj());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        System.out.print("  > Telefone: ");
-        restaurante.setTelefone(lerTexto("Telefone"));
+        // Telefone
+        do {
+            System.out.print("  > Telefone: ");
+            restaurante.setTelefone(lerTexto("Telefone"));
+            erro = restauranteService.validarTelefone(restaurante.getTelefone());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        System.out.print("  > Categoria: ");
-        restaurante.setCategoria(lerTexto("Categoria"));
+        // Categoria
+        do {
+            System.out.print("  > Categoria: ");
+            restaurante.setCategoria(lerTexto("Categoria"));
+            erro = restauranteService.validarCategoria(restaurante.getCategoria());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        System.out.print("  > Email: ");
-        restaurante.setEmail(lerTexto("Email"));
+        // Email
+        do {
+            System.out.print("  > Email: ");
+            restaurante.setEmail(lerTexto("Email"));
+            erro = restauranteService.validarEmail(restaurante.getEmail());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        System.out.print("  > Senha: ");
-        restaurante.setSenha(lerTexto("Senha"));
+        // Senha
+        do {
+            System.out.print("  > Senha (mínimo 6 caracteres): ");
+            restaurante.setSenha(lerTexto("Senha"));
+            erro = restauranteService.validarSenha(restaurante.getSenha());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        boolean sucesso =
-                restauranteService.cadastrar(restaurante);
+        Loading.LimparTerminal("Salvando dados...");
 
-        if (sucesso) {
+        restauranteService.cadastrar(restaurante);
 
-            Loading.LimparTerminal("Salvando dados...");
-
-            System.out.println("┌──────────────────────────────────┐");
-            System.out.println("│       CADASTRO REALIZADO!        │");
-            System.out.println("├──────────────────────────────────┤");
-            System.out.printf ("│  Nome:      %-21s│%n", restaurante.getNome());
-            System.out.printf ("│  CNPJ:      %-21s│%n", restaurante.getCnpj());
-            System.out.printf ("│  Email:     %-21s│%n", restaurante.getEmail());
-            System.out.printf ("│  Telefone:  %-21s│%n", restaurante.getTelefone());
-            System.out.printf ("│  Categoria: %-21s│%n", restaurante.getCategoria());
-            System.out.println("└──────────────────────────────────┘");
-
-        } else {
-
-            System.out.println("┌──────────────────────────────────┐");
-            System.out.println("│      ERRO NO CADASTRO!           │");
-            System.out.println("│  Verifique os dados digitados.   │");
-            System.out.println("└──────────────────────────────────┘");
-        }
-
+        System.out.println("┌──────────────────────────────────┐");
+        System.out.println("│       CADASTRO REALIZADO!        │");
+        System.out.println("├──────────────────────────────────┤");
+        System.out.printf ("│  Nome:      %-21s│%n", restaurante.getNome());
+        System.out.printf ("│  CNPJ:      %-21s│%n", restaurante.getCnpj());
+        System.out.printf ("│  Email:     %-21s│%n", restaurante.getEmail());
+        System.out.printf ("│  Telefone:  %-21s│%n", restaurante.getTelefone());
+        System.out.printf ("│  Categoria: %-21s│%n", restaurante.getCategoria());
+        System.out.println("└──────────────────────────────────┘");
         Input.pausar("  [ENTER] Continuar...");
     }
 
@@ -215,6 +237,7 @@ public class InterfaceRestaurante {
                     break;
                 default:
                     System.out.println("  > Opção inválida! Escolha entre 0 e 3.");
+                    Loading.esperar(1200);
             }
         }
     }
@@ -270,6 +293,7 @@ public class InterfaceRestaurante {
                     break;
                 default:
                     System.out.println("  > Opção inválida! Escolha entre 0 e 4.");
+                    Loading.esperar(1200);
             }
         }
     }
@@ -325,6 +349,7 @@ public class InterfaceRestaurante {
 
         if (id == 0) {
             System.out.println("  > Operação cancelada.");
+            Loading.esperar(1200);
             return;
         }
 
@@ -354,6 +379,7 @@ public class InterfaceRestaurante {
 
         if (id == 0) {
             System.out.println("  > Operação cancelada.");
+            Loading.esperar(1200);
             return;
         }
 
@@ -383,6 +409,7 @@ public class InterfaceRestaurante {
 
         if (id == 0) {
             System.out.println("  > Operação cancelada.");
+            Loading.esperar(1200);
             return;
         }
 

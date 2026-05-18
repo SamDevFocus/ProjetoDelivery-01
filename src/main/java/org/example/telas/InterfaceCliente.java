@@ -10,32 +10,22 @@ import java.util.List;
 
 import static org.example.utils.Input.lerOpcao;
 
-
 public class InterfaceCliente {
 
-    private ClienteService clienteService =
-            new ClienteService();
-
-    private RestauranteService restauranteService =
-            new RestauranteService();
-
-    private ProdutoService produtoService =
-            new ProdutoService();
-
-    private PedidoService pedidoService =
-            new PedidoService();
-
+    private ClienteService clienteService = new ClienteService();
+    private RestauranteService restauranteService = new RestauranteService();
+    private ProdutoService produtoService = new ProdutoService();
+    private PedidoService pedidoService = new PedidoService();
+    private ItemPedidoService itemPedidoService = new ItemPedidoService();
     private Cliente clienteLogado;
 
-    private ItemPedidoService itemPedidoService =
-            new ItemPedidoService();
-
+    // =========================================================
+    // INICIO
+    // =========================================================
     public void inicioCliente() {
-
         boolean rodando = true;
 
         while (rodando) {
-
             Loading.LimparTerminal("Carregando...");
 
             System.out.println("┌──────────────────────────────────┐");
@@ -49,35 +39,32 @@ public class InterfaceCliente {
             System.out.println("│  [0] Voltar                      │");
             System.out.println("│                                  │");
             System.out.println("└──────────────────────────────────┘");
-
             System.out.print("  > ");
 
-            int opcaoInicialCliente = lerOpcao();
+            int opcao = lerOpcao();
 
-            switch (opcaoInicialCliente) {
-
+            switch (opcao) {
                 case 1:
                     exibirLogin();
                     break;
-
                 case 2:
                     exibirCadastro();
                     break;
-
                 case 0:
                     Loading.LimparTerminal("Voltando...");
                     rodando = false;
                     break;
-
                 default:
                     System.out.println("  > Opção inválida! Escolha 0, 1 ou 2.");
+                    Loading.esperar(1200);
             }
         }
     }
 
-
+    // =========================================================
+    // LOGIN
+    // =========================================================
     public void exibirLogin() {
-
         Loading.LimparTerminal("Carregando login...");
 
         System.out.println("┌──────────────────────────────────┐");
@@ -94,37 +81,32 @@ public class InterfaceCliente {
 
         Loading.LimparTerminal("Autenticando...");
 
-        Cliente cliente =
-                clienteService.login(email, senha);
+        Cliente cliente = clienteService.login(email, senha);
 
         if (cliente != null) {
-
             clienteLogado = cliente;
 
             System.out.println("┌──────────────────────────────────┐");
-            System.out.printf ("│  Bem-vindo, %-21s│%n",
-                    cliente.getNome() + "!");
+            System.out.printf ("│  Bem-vindo, %-21s│%n", cliente.getNome() + "!");
             System.out.println("└──────────────────────────────────┘");
-
             System.out.println("  [ENTER] Continuar...");
             Input.scanner.nextLine();
 
             exibirMenu();
-
         } else {
-
             System.out.println("┌──────────────────────────────────┐");
-            System.out.println("│  Usuário não encontrado!         │");
-            System.out.println("│  Verifique os dados informados.  │");
+            System.out.println("│  > Usuário não encontrado!       │");
+            System.out.println("│  > Verifique os dados informados.│");
             System.out.println("└──────────────────────────────────┘");
-
             System.out.println("  [ENTER] Voltar...");
             Input.scanner.nextLine();
         }
     }
 
+    // =========================================================
+    // CADASTRO — usa validação do service em loop
+    // =========================================================
     public void exibirCadastro() {
-
         Loading.LimparTerminal("Carregando cadastro...");
 
         System.out.println("┌──────────────────────────────────┐");
@@ -134,89 +116,86 @@ public class InterfaceCliente {
         System.out.println("└──────────────────────────────────┘");
 
         Cliente cliente = new Cliente();
+        String erro;
 
-        System.out.print("  > Nome: ");
-        cliente.setNome(
-                Input.lerTexto("Nome")
-        );
+        // Nome
+        do {
+            System.out.print("  > Nome: ");
+            cliente.setNome(Input.lerTexto("Nome"));
+            erro = clienteService.validarNome(cliente.getNome());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        System.out.print("  > CPF: ");
-        cliente.setCpf(
-                Input.lerTexto("CPF")
-        );
+        // CPF
+        do {
+            System.out.print("  > CPF (apenas números): ");
+            cliente.setCpf(Input.lerTexto("CPF"));
+            erro = clienteService.validarCpf(cliente.getCpf());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        System.out.print("  > Email: ");
-        cliente.setEmail(
-                Input.lerTexto("Email")
-        );
+        // Email
+        do {
+            System.out.print("  > Email: ");
+            cliente.setEmail(Input.lerTexto("Email"));
+            erro = clienteService.validarEmail(cliente.getEmail());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        System.out.print("  > Senha: ");
-        cliente.setSenha(
-                Input.lerTexto("Senha")
-        );
+        // Senha
+        do {
+            System.out.print("  > Senha (mínimo 6 caracteres): ");
+            cliente.setSenha(Input.lerTexto("Senha"));
+            erro = clienteService.validarSenha(cliente.getSenha());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
-        System.out.print("  > Telefone: ");
-        cliente.setTelefone(
-                Input.lerTexto("Telefone")
-        );
+        // Telefone
+        do {
+            System.out.print("  > Telefone: ");
+            cliente.setTelefone(Input.lerTexto("Telefone"));
+            erro = clienteService.validarTelefone(cliente.getTelefone());
+            if (erro != null) System.out.println("  > " + erro);
+        } while (erro != null);
 
         System.out.print("  > Rua: ");
-        cliente.setRua(
-                Input.lerTexto("Rua")
-        );
+        cliente.setRua(Input.lerTexto("Rua"));
 
         System.out.print("  > Número: ");
-        cliente.setNumero(
-                Input.lerTexto("Número")
-        );
+        cliente.setNumero(Input.lerTexto("Número"));
 
         System.out.print("  > Bairro: ");
-        cliente.setBairro(
-                Input.lerTexto("Bairro")
-        );
+        cliente.setBairro(Input.lerTexto("Bairro"));
 
         System.out.print("  > Cidade: ");
-        cliente.setCidade(
-                Input.lerTexto("Cidade")
-        );
+        cliente.setCidade(Input.lerTexto("Cidade"));
 
         Loading.LimparTerminal("Salvando dados...");
 
         clienteService.cadastrar(cliente);
 
         System.out.println("┌──────────────────────────────────┐");
-        System.out.println("│      CADASTRO REALIZADO!         │");
+        System.out.println("│       CADASTRO REALIZADO!        │");
         System.out.println("├──────────────────────────────────┤");
-        System.out.printf ("│  Nome: %-26s│%n",
-                cliente.getNome());
-
-        System.out.printf ("│  Email: %-25s│%n",
-                cliente.getEmail());
-
-        System.out.printf ("│  Cidade: %-24s│%n",
-                cliente.getCidade());
-
+        System.out.printf ("│  Nome:   %-24s│%n", cliente.getNome());
+        System.out.printf ("│  Email:  %-24s│%n", cliente.getEmail());
+        System.out.printf ("│  Cidade: %-24s│%n", cliente.getCidade());
         System.out.println("└──────────────────────────────────┘");
-
         Input.pausar("  [ENTER] Continuar...");
     }
 
+    // =========================================================
+    // MENU PRINCIPAL
+    // =========================================================
     public void exibirMenu() {
-
         boolean rodando = true;
 
         while (rodando) {
-
             Loading.LimparTerminal("Carregando menu...");
 
             System.out.println("┌──────────────────────────────────┐");
             System.out.println("│         COMIDINHA                │");
-
-            System.out.printf (
-                    "│ Cliente: %-24s│%n",
-                    clienteLogado.getNome()
-            );
-
+            System.out.printf ("│  Cliente: %-23s│%n", clienteLogado.getNome());
             System.out.println("├──────────────────────────────────┤");
             System.out.println("│                                  │");
             System.out.println("│  [1] Restaurantes                │");
@@ -225,89 +204,53 @@ public class InterfaceCliente {
             System.out.println("│  [0] Sair                        │");
             System.out.println("│                                  │");
             System.out.println("└──────────────────────────────────┘");
-
             System.out.print("  > ");
 
-            int opcaoInicial =
-                    Input.lerOpcao();
+            int opcao = Input.lerOpcao();
 
-            switch (opcaoInicial) {
-
+            switch (opcao) {
                 case 1:
-
                     listarRestaurantes();
                     break;
-
                 case 2:
-
                     meusPedidos();
                     break;
-
                 case 0:
-
-                    Loading.LimparTerminal(
-                            "Saindo..."
-                    );
-
+                    Loading.LimparTerminal("Saindo...");
                     rodando = false;
                     break;
-
                 default:
-
-                    System.out.println(
-                            "  > Opção inválida!"
-                    );
-
-                    try {
-
-                        Thread.sleep(1200);
-
-                    } catch (InterruptedException e) {
-
-                        e.printStackTrace();
-                    }
+                    System.out.println("  > Opção inválida! Escolha entre 0 e 2.");
+                    Loading.esperar(1200);
             }
         }
     }
 
+    // =========================================================
+    // LISTAR RESTAURANTES
+    // =========================================================
     public void listarRestaurantes() {
+        Loading.LimparTerminal("Buscando restaurantes...");
 
-        Loading.LimparTerminal(
-                "Buscando restaurantes..."
-        );
-
-        List<Restaurante> restaurantes =
-                restauranteService.listar();
+        List<Restaurante> restaurantes = restauranteService.listar();
 
         System.out.println("┌──────────────────────────────────┐");
         System.out.println("│          RESTAURANTES            │");
         System.out.println("├──────────────────────────────────┤");
 
         if (restaurantes.isEmpty()) {
+            System.out.println("│  > Nenhum restaurante disponível.│");
+            System.out.println("└──────────────────────────────────┘");
+            System.out.println("  [ENTER] Voltar...");
+            Input.scanner.nextLine();
+            return;
+        }
 
-            System.out.println("│  Nenhum restaurante encontrado.  │");
-
-        } else {
-
-            for (Restaurante r : restaurantes) {
-
-                System.out.printf (
-                        "│  ID: %-28s %n",
-                        "#" + r.getId()
-                );
-
-                System.out.printf (
-                        "│  Nome: %-26s %n",
-                        r.getNome()
-                );
-
-                System.out.printf (
-                        "│  Endereço: %-22s %n",
-                        r.getEndereco()
-                );
-
-                System.out.println("├──────────────────────────────────┤");
-            }
+        for (Restaurante r : restaurantes) {
+            System.out.printf("│  ID:       %-22s│%n", "#" + r.getId());
+            System.out.printf("│  Nome:     %-22s│%n", r.getNome());
+            System.out.printf("│  Endereço: %-22s│%n", r.getEndereco());
+            System.out.println("├──────────────────────────────────┤");
         }
 
         System.out.println("│                                  │");
@@ -315,329 +258,185 @@ public class InterfaceCliente {
         System.out.println("│  [0] Voltar                      │");
         System.out.println("│                                  │");
         System.out.println("└──────────────────────────────────┘");
-
         System.out.print("  > ");
 
-        int opcao =
-                Input.lerOpcao();
+        int opcao = Input.lerOpcao();
 
         switch (opcao) {
-
             case 1:
-
-                System.out.print(
-                        "\n  > ID do restaurante: "
-                );
-
-                int idRestaurante =
-                        Input.lerOpcao();
-
-                fazerPedido(
-                        idRestaurante
-                );
-
+                System.out.print("\n  > ID do restaurante: ");
+                int idRestaurante = Input.lerOpcao();
+                fazerPedido(idRestaurante);
                 break;
-
             case 0:
-
-                return;
-
+                break;
             default:
-
-                System.out.println(
-                        "\n  > Opção inválida!"
-                );
-
-                try {
-
-                    Thread.sleep(1200);
-
-                } catch (InterruptedException e) {
-
-                    e.printStackTrace();
-                }
+                System.out.println("  > Opção inválida!");
+                Loading.esperar(1200);
         }
     }
 
-
+    // =========================================================
+    // FAZER PEDIDO
+    // =========================================================
     public void fazerPedido(int idRestaurante) {
+        Loading.LimparTerminal("Carregando cardápio...");
 
-        Loading.LimparTerminal(
-                "Carregando cardápio..."
-        );
-
-        List<Produto> produtos =
-                produtoService
-                        .listarPorRestaurante(
-                                idRestaurante
-                        );
-
-        boolean adicionando = true;
-
-        List<Produto> carrinho =
-                new ArrayList<>();
-
-        double total = 0;
+        List<Produto> produtos = produtoService.listarPorRestaurante(idRestaurante);
 
         System.out.println("┌──────────────────────────────────┐");
         System.out.println("│             CARDÁPIO             │");
         System.out.println("├──────────────────────────────────┤");
 
         if (produtos.isEmpty()) {
-
-            System.out.println("│  Nenhum produto encontrado.      │");
+            System.out.println("│  > Nenhum produto disponível.    │");
             System.out.println("└──────────────────────────────────┘");
-
-            System.out.println("\n  [ENTER] Voltar...");
+            System.out.println("  [ENTER] Voltar...");
             Input.scanner.nextLine();
-
             return;
         }
 
         for (Produto p : produtos) {
-
-            System.out.printf (
-                    "│  ID: %-28s %n",
-                    "#" + p.getId()
-            );
-
-            System.out.printf (
-                    "│  Produto: %-23s %n",
-                    p.getNome()
-            );
-
-            System.out.printf (
-                    "│  Preço: R$ %-20.2f %n",
-                    p.getPreco()
-            );
-
+            System.out.printf("│  ID:     %-24s│%n", "#" + p.getId());
+            System.out.printf("│  Nome:   %-24s│%n", p.getNome());
+            System.out.printf("│  Preço:  R$%-21.2f│%n", p.getPreco());
             System.out.println("├──────────────────────────────────┤");
         }
 
         System.out.println("└──────────────────────────────────┘");
 
+        boolean adicionando = true;
+        List<Produto> carrinho = new ArrayList<>();
+        double total = 0;
+
         while (adicionando) {
+            System.out.print("\n  > ID do produto (0 para ver carrinho): ");
+            int idProduto = Input.lerOpcao();
 
-            System.out.print(
-                    "\n  > ID do produto: "
-            );
+            if (idProduto == 0) {
+                adicionando = false;
+                continue;
+            }
 
-            int idProduto =
-                    Input.lerOpcao();
-
-            Produto produtoEscolhido =
-                    null;
-
+            Produto produtoEscolhido = null;
             for (Produto p : produtos) {
-
                 if (p.getId() == idProduto) {
-
                     produtoEscolhido = p;
                     break;
                 }
             }
 
             if (produtoEscolhido != null) {
+                carrinho.add(produtoEscolhido);
+                total += produtoEscolhido.getPreco();
+                System.out.printf("  > %s adicionado! R$%.2f%n",
+                        produtoEscolhido.getNome(), produtoEscolhido.getPreco());
 
-                carrinho.add(
-                        produtoEscolhido
-                );
+                System.out.println("\n┌──────────────────────────────────┐");
+                System.out.println("│  [1] Adicionar mais produtos     │");
+                System.out.println("│  [0] Ver carrinho                │");
+                System.out.println("└──────────────────────────────────┘");
+                System.out.print("  > ");
 
-                total +=
-                        produtoEscolhido.getPreco();
-
-                System.out.println(
-                        "\n  > Produto adicionado!"
-                );
-
-                System.out.println(
-                        "  > " +
-                                produtoEscolhido.getNome()
-                );
-
+                int continua = Input.lerOpcao();
+                if (continua == 0) adicionando = false;
             } else {
-
-                System.out.println(
-                        "\n  > Produto não encontrado!"
-                );
-
-                continue;
-            }
-
-            System.out.println("\n┌──────────────────────────────────┐");
-            System.out.println("│  [1] Adicionar mais produtos     │");
-            System.out.println("│  [2] Finalizar pedido            │");
-            System.out.println("└──────────────────────────────────┘");
-
-            System.out.print("  > ");
-
-            int opcao =
-                    Input.lerOpcao();
-
-            if (opcao == 2) {
-
-                adicionando = false;
+                System.out.println("  > Produto não encontrado! Verifique o ID.");
             }
         }
 
-        Loading.LimparTerminal(
-                "Gerando resumo..."
-        );
+        if (carrinho.isEmpty()) {
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│  > Carrinho vazio.               │");
+            System.out.println("│  > Pedido cancelado.             │");
+            System.out.println("└──────────────────────────────────┘");
+            System.out.println("  [ENTER] Voltar...");
+            Input.scanner.nextLine();
+            return;
+        }
+
+        Loading.LimparTerminal("Gerando resumo...");
 
         System.out.println("┌──────────────────────────────────┐");
         System.out.println("│          RESUMO PEDIDO           │");
         System.out.println("├──────────────────────────────────┤");
 
         for (Produto produto : carrinho) {
-
-            System.out.printf (
-                    "│  %-30s│%n",
-                    produto.getNome()
-            );
+            System.out.printf("│  %-30s│%n", produto.getNome());
         }
 
         System.out.println("├──────────────────────────────────┤");
-
-        System.out.printf (
-                "│  Subtotal: R$ %-16.2f│%n",
-                total
-        );
-
-        System.out.printf (
-                "│  Taxa Entrega: R$ %-12.2f│%n",
-                5.0
-        );
-
-        System.out.printf (
-                "│  TOTAL: R$ %-19.2f│%n",
-                total + 5.0
-        );
-
+        System.out.printf ("│  Subtotal:     R$%-14.2f│%n", total);
+        System.out.printf ("│  Taxa Entrega: R$%-14.2f│%n", 5.0);
+        System.out.println("├──────────────────────────────────┤");
+        System.out.printf ("│  TOTAL:        R$%-14.2f│%n", total + 5.0);
         System.out.println("├──────────────────────────────────┤");
         System.out.println("│  [1] Confirmar Pedido            │");
         System.out.println("│  [0] Cancelar                    │");
         System.out.println("└──────────────────────────────────┘");
-
         System.out.print("  > ");
 
-        int confirma =
-                Input.lerOpcao();
+        int confirma = Input.lerOpcao();
 
         if (confirma == 1) {
+            Pedido pedido = new Pedido();
+            pedido.setStatus("Aguardando");
+            pedido.setIdCliente(clienteLogado.getId());
+            pedido.setIdRestaurante(idRestaurante);
 
-            Pedido pedido =
-                    new Pedido();
-
-            pedido.setStatus(
-                    "Aguardando"
-            );
-
-            pedido.setIdCliente(
-                    clienteLogado.getId()
-            );
-
-            pedido.setIdRestaurante(
-                    idRestaurante
-            );
-
-            int idPedido =
-                    pedidoService
-                            .salvarPedido(
-                                    pedido
-                            );
+            int idPedido = pedidoService.salvarPedido(pedido);
 
             for (Produto produto : carrinho) {
-
-                ItemPedido item =
-                        new ItemPedido();
-
+                ItemPedido item = new ItemPedido();
                 item.setQuantidade(1);
-
-                item.setPrecoUnit(
-                        produto.getPreco()
-                );
-
-                item.setIdPedido(
-                        idPedido
-                );
-
-                item.setIdProduto(
-                        produto.getId()
-                );
-
-                itemPedidoService
-                        .salvarItem(item);
+                item.setPrecoUnit(produto.getPreco());
+                item.setIdPedido(idPedido);
+                item.setIdProduto(produto.getId());
+                itemPedidoService.salvarItem(item);
             }
 
-            Loading.LimparTerminal(
-                    "Finalizando pedido..."
-            );
+            Loading.LimparTerminal("Finalizando pedido...");
 
             System.out.println("┌──────────────────────────────────┐");
             System.out.println("│        PEDIDO REALIZADO!         │");
-
-            System.out.printf (
-                    "│  Pedido #%04d criado com sucesso │%n",
-                    idPedido
-            );
-
-            System.out.println("│  Aguarde a confirmação do        │");
+            System.out.printf ("│  Pedido #%04d enviado!           │%n", idPedido);
+            System.out.println("│  Aguarde confirmação do          │");
             System.out.println("│  restaurante.                    │");
             System.out.println("└──────────────────────────────────┘");
-
         } else {
-
-            System.out.println("\n  > Pedido cancelado!");
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│  > Pedido cancelado.             │");
+            System.out.println("└──────────────────────────────────┘");
         }
 
-        System.out.println("\n  [ENTER] Continuar...");
+        System.out.println("  [ENTER] Continuar...");
         Input.scanner.nextLine();
     }
 
+    // =========================================================
+    // MEUS PEDIDOS
+    // =========================================================
     public void meusPedidos() {
+        Loading.LimparTerminal("Buscando pedidos...");
 
-        Loading.LimparTerminal(
-                "Buscando pedidos..."
-        );
-
-        List<Pedido> pedidos =
-                pedidoService
-                        .listarPorCliente(
-                                clienteLogado.getId()
-                        );
+        List<Pedido> pedidos = pedidoService.listarPorCliente(clienteLogado.getId());
 
         System.out.println("┌──────────────────────────────────┐");
         System.out.println("│           MEUS PEDIDOS           │");
         System.out.println("├──────────────────────────────────┤");
 
         if (pedidos.isEmpty()) {
-
-            System.out.println("│  Nenhum pedido encontrado.       │");
+            System.out.println("│  > Nenhum pedido encontrado.     │");
             System.out.println("└──────────────────────────────────┘");
-
-            System.out.println("\n  [ENTER] Voltar...");
+            System.out.println("  [ENTER] Voltar...");
             Input.scanner.nextLine();
-
             return;
         }
 
         for (Pedido p : pedidos) {
-
-            System.out.printf (
-                    "│  Pedido: #%04d                  │%n",
-                    p.getId()
-            );
-
-            System.out.printf (
-                    "│  Status: %-24s│%n",
-                    p.getStatus()
-            );
-
-            System.out.printf (
-                    "│  Restaurante ID: %-16s│%n",
-                    "#" + p.getIdRestaurante()
-            );
-
+            System.out.printf("│  Pedido:      #%04d              │%n", p.getId());
+            System.out.printf("│  Status:      %-19s│%n", p.getStatus());
+            System.out.printf("│  Restaurante: %-19s│%n", "#" + p.getIdRestaurante());
             System.out.println("├──────────────────────────────────┤");
         }
 
@@ -646,73 +445,37 @@ public class InterfaceCliente {
         System.out.println("│  [0] Voltar                      │");
         System.out.println("│                                  │");
         System.out.println("└──────────────────────────────────┘");
-
         System.out.print("  > ");
 
-        int opcao =
-                Input.lerOpcao();
+        int opcao = Input.lerOpcao();
 
         switch (opcao) {
-
             case 1:
-
-                System.out.print(
-                        "\n  > ID do pedido: "
-                );
-
-                int id =
-                        Input.lerOpcao();
-
+                System.out.print("\n  > ID do pedido: #");
+                int id = Input.lerOpcao();
                 detalhesPedido(id);
-
                 break;
-
             case 0:
-
-                return;
-
+                break;
             default:
-
-                System.out.println(
-                        "\n  > Opção inválida!"
-                );
-
-                try {
-
-                    Thread.sleep(1200);
-
-                } catch (InterruptedException e) {
-
-                    e.printStackTrace();
-                }
+                System.out.println("  > Opção inválida!");
+                Loading.esperar(1200);
         }
     }
 
+    // =========================================================
+    // DETALHES DO PEDIDO
+    // =========================================================
     private void detalhesPedido(int id) {
-
-        Loading.LimparTerminal(
-                "Carregando detalhes..."
-        );
+        Loading.LimparTerminal("Carregando detalhes...");
 
         System.out.println("┌──────────────────────────────────┐");
-        System.out.println("│         DETALHES PEDIDO          │");
+        System.out.printf ("│  DETALHES DO PEDIDO #%04d        │%n", id);
         System.out.println("├──────────────────────────────────┤");
-
-        System.out.printf (
-                "│  Pedido: #%04d                  │%n",
-                id
-        );
-
-        System.out.println("├──────────────────────────────────┤");
-        System.out.println("│                                  │");
         System.out.println("│  Funcionalidade em               │");
         System.out.println("│  desenvolvimento.                │");
-        System.out.println("│                                  │");
         System.out.println("└──────────────────────────────────┘");
-
-        System.out.println("\n  [ENTER] Voltar...");
+        System.out.println("  [ENTER] Voltar...");
         Input.scanner.nextLine();
     }
-
-
 }
