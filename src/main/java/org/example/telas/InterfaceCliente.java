@@ -198,8 +198,7 @@ public class InterfaceCliente {
 
         System.out.println("└──────────────────────────────────┘");
 
-        System.out.println("  [ENTER] Continuar...");
-        Input.scanner.nextLine();
+        Input.pausar("  [ENTER] Continuar...");
     }
 
     public void exibirMenu() {

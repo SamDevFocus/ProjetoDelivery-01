@@ -14,9 +14,8 @@ public class RestauranteService {
         return restauranteDAO.listar();
     }
 
-    public void cadastrar(Restaurante restaurante) {
-
-        restauranteDAO.cadastrar(restaurante);
+    public boolean cadastrar(Restaurante restaurante){
+        return restauranteDAO.cadastrar(restaurante);
     }
 
     public Restaurante login(String email, String senha) {

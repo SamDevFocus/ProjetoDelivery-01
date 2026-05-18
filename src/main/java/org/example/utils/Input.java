@@ -4,11 +4,10 @@ import java.util.Scanner;
 
 public class Input {
 
-    public static Scanner scanner =
-            new Scanner(System.in);
+    public static Scanner scanner = new Scanner(System.in);
 
     // =========================================================
-    // INTEIROS
+    // LEITURA SEGURA DE INTEIROS
     // =========================================================
     public static int lerOpcao() {
 
@@ -16,65 +15,67 @@ public class Input {
 
             try {
 
-                return Integer.parseInt(
+                int valor = Integer.parseInt(
                         scanner.nextLine()
                 );
 
-            } catch (Exception e) {
+                return valor;
 
-                System.out.println(
-                        "  > Digite apenas números!"
+            } catch (NumberFormatException e) {
+
+                System.out.print(
+                        "  > Digite apenas números: "
                 );
-
-                System.out.print("  > ");
             }
         }
     }
 
     // =========================================================
-    // DOUBLE
-    // =========================================================
-    public static double lerDouble() {
-
-        while (true) {
-
-            try {
-
-                return Double.parseDouble(
-                        scanner.nextLine()
-                                .replace(",", ".")
-                );
-
-            } catch (Exception e) {
-
-                System.out.println(
-                        "  > Digite um valor válido!"
-                );
-
-                System.out.print("  > ");
-            }
-        }
-    }
-
-    // =========================================================
-    // TEXTO
+    // LEITURA SEGURA DE TEXTO
     // =========================================================
     public static String lerTexto(String campo) {
 
         while (true) {
 
-            String valor =
-                    scanner.nextLine();
+            String valor = scanner.nextLine();
 
             if (!valor.trim().isEmpty()) {
-
                 return valor;
             }
 
-            System.out.print(
-                    "  > " + campo +
-                            " não pode ser vazio: "
-            );
+            System.out.print("  > " + campo + " não pode ser vazio: ");
+        }
+    }
+
+    // =========================================================
+    // PAUSAR TELA
+    // =========================================================
+    public static void pausar(String mensagem) {
+
+        System.out.println(mensagem);
+        scanner.nextLine();
+    }
+
+    public static double lerDouble(String mensagem) {
+
+        while (true) {
+
+            try {
+
+                System.out.print(mensagem);
+
+                return Double.parseDouble(
+                        scanner
+                                .nextLine()
+                                .replace(",", ".")
+                );
+
+            } catch (NumberFormatException e) {
+
+                System.out.println(
+                        "  > Digite um valor válido!"
+                );
+            }
         }
     }
 }

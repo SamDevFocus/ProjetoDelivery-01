@@ -10,6 +10,7 @@ import org.example.utils.Loading;
 import org.example.utils.StatusPedido;
 
 import static org.example.utils.Input.lerOpcao;
+import static org.example.utils.Input.lerTexto;
 import static org.example.utils.Loading.limparTela;
 
 public class InterfaceRestaurante {
@@ -18,20 +19,6 @@ public class InterfaceRestaurante {
     private RestauranteService restauranteService = new RestauranteService();
     private Restaurante restauranteLogado;
     private InterfaceProdutoRestaurante produtoInterface = new InterfaceProdutoRestaurante();
-
-    // =========================================================
-    // UTILITARIO — leitura segura de texto nao vazio
-    // evita campos em branco no cadastro
-    // =========================================================
-    private String lerTexto(String campo) {
-        while (true) {
-            String valor = Input.scanner.nextLine();
-            if (!valor.trim().isEmpty()) {
-                return valor;
-            }
-            System.out.print("  > " + campo + " não pode ser vazio: ");
-        }
-    }
 
     // =========================================================
     // INICIO
@@ -86,7 +73,6 @@ public class InterfaceRestaurante {
         System.out.println("│  Informe suas credenciais:       │");
         System.out.println("└──────────────────────────────────┘");
 
-        Input.scanner.nextLine();
 
         System.out.print("  > Email: ");
         String email = lerTexto("Email");
@@ -113,8 +99,7 @@ public class InterfaceRestaurante {
             System.out.println("│  > Email ou senha incorretos!    │");
             System.out.println("│  > Verifique e tente novamente.  │");
             System.out.println("└──────────────────────────────────┘");
-            System.out.println("  [ENTER] Voltar...");
-            Input.scanner.nextLine();
+        Input.pausar("  [ENTER] Continuar...");
         }
     }
 
@@ -130,7 +115,6 @@ public class InterfaceRestaurante {
         System.out.println("│  Preencha os dados abaixo:       │");
         System.out.println("└──────────────────────────────────┘");
 
-        Input.scanner.nextLine();
 
         Restaurante restaurante = new Restaurante();
 
@@ -155,21 +139,32 @@ public class InterfaceRestaurante {
         System.out.print("  > Senha: ");
         restaurante.setSenha(lerTexto("Senha"));
 
-        restauranteService.cadastrar(restaurante);
+        boolean sucesso =
+                restauranteService.cadastrar(restaurante);
 
-        Loading.LimparTerminal("Salvando dados...");
+        if (sucesso) {
 
-        System.out.println("┌──────────────────────────────────┐");
-        System.out.println("│       CADASTRO REALIZADO!        │");
-        System.out.println("├──────────────────────────────────┤");
-        System.out.printf ("│  Nome:      %-21s│%n", restaurante.getNome());
-        System.out.printf ("│  CNPJ:      %-21s│%n", restaurante.getCnpj());
-        System.out.printf ("│  Email:     %-21s│%n", restaurante.getEmail());
-        System.out.printf ("│  Telefone:  %-21s│%n", restaurante.getTelefone());
-        System.out.printf ("│  Categoria: %-21s│%n", restaurante.getCategoria());
-        System.out.println("└──────────────────────────────────┘");
-        System.out.println("  [ENTER] Continuar...");
-        Input.scanner.nextLine();
+            Loading.LimparTerminal("Salvando dados...");
+
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│       CADASTRO REALIZADO!        │");
+            System.out.println("├──────────────────────────────────┤");
+            System.out.printf ("│  Nome:      %-21s│%n", restaurante.getNome());
+            System.out.printf ("│  CNPJ:      %-21s│%n", restaurante.getCnpj());
+            System.out.printf ("│  Email:     %-21s│%n", restaurante.getEmail());
+            System.out.printf ("│  Telefone:  %-21s│%n", restaurante.getTelefone());
+            System.out.printf ("│  Categoria: %-21s│%n", restaurante.getCategoria());
+            System.out.println("└──────────────────────────────────┘");
+
+        } else {
+
+            System.out.println("┌──────────────────────────────────┐");
+            System.out.println("│      ERRO NO CADASTRO!           │");
+            System.out.println("│  Verifique os dados digitados.   │");
+            System.out.println("└──────────────────────────────────┘");
+        }
+
+        Input.pausar("  [ENTER] Continuar...");
     }
 
     // =========================================================
@@ -311,9 +306,7 @@ public class InterfaceRestaurante {
             System.out.println("└──────────────────────────────────┘");
         }
 
-        System.out.println("  [ENTER] Voltar...");
-        Input.scanner.nextLine();
-        Input.scanner.nextLine();
+        Input.pausar("  [ENTER] Continuar...");
     }
 
     // =========================================================
@@ -342,9 +335,7 @@ public class InterfaceRestaurante {
         System.out.printf ("│  Pedido #%04d aceito!            │%n", id);
         System.out.println("│  > Status: Em preparo            │");
         System.out.println("└──────────────────────────────────┘");
-        System.out.println("  [ENTER] Continuar...");
-        Input.scanner.nextLine();
-        Input.scanner.nextLine();
+        Input.pausar("  [ENTER] Continuar...");
     }
 
     // =========================================================
@@ -373,9 +364,7 @@ public class InterfaceRestaurante {
         System.out.printf ("│  Pedido #%04d cancelado!         │%n", id);
         System.out.println("│  > Status: Cancelado             │");
         System.out.println("└──────────────────────────────────┘");
-        System.out.println("  [ENTER] Continuar...");
-        Input.scanner.nextLine();
-        Input.scanner.nextLine();
+        Input.pausar("  [ENTER] Continuar...");
     }
 
     // =========================================================
@@ -404,8 +393,6 @@ public class InterfaceRestaurante {
         System.out.printf ("│  Pedido #%04d finalizado!        │%n", id);
         System.out.println("│  > Disponivel para entrega!      │");
         System.out.println("└──────────────────────────────────┘");
-        System.out.println("  [ENTER] Continuar...");
-        Input.scanner.nextLine();
-        Input.scanner.nextLine();
+        Input.pausar("  [ENTER] Continuar...");
     }
 }

@@ -118,13 +118,11 @@ public class InterfaceProdutoRestaurante {
                 Input.lerTexto("Nome")
         );
 
-        System.out.print("  > Preço: R$ ");
-
-        p.setPreco(
-                Double.parseDouble(
-                        Input.scanner.nextLine()
-                )
-        );
+p.setPreco(
+        Input.lerDouble(
+                "  > Preço: R$ "
+        )
+);
 
         System.out.print("  > Categoria: ");
 

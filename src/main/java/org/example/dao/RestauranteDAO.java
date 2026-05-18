@@ -156,7 +156,7 @@ public class RestauranteDAO {
     }
 
 
-    public void cadastrar(Restaurante restaurante){
+    public boolean cadastrar(Restaurante restaurante){
 
         String sql =
                 "INSERT INTO Restaurante " +
@@ -165,8 +165,7 @@ public class RestauranteDAO {
 
         try {
 
-            Connection conn =
-                    Conexao.conectar();
+            Connection conn = Conexao.conectar();
 
             PreparedStatement stmt =
                     conn.prepareStatement(sql);
@@ -183,8 +182,14 @@ public class RestauranteDAO {
 
             conn.close();
 
+            return true;
+
         } catch (Exception e){
-            e.printStackTrace();
+
+            System.out.println("\n  > Erro ao cadastrar restaurante!");
+            System.out.println("  > " + e.getMessage());
+
+            return false;
         }
     }
 
